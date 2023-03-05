@@ -41,7 +41,13 @@ void unicorn_loop() {
 }
 
 void track_secret(unsigned long int m) {
-
+    if (secret_index == -1) {
+        secret_start = m;
+        secret_index = 0;
+    }
+    if (secret_index >= 0) {
+        
+    }
 }
 
 void handle_press(unsigned long int m, int state) {
