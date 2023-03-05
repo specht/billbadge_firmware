@@ -57,6 +57,7 @@ void track_secret(unsigned long int m) {
                 secret_index = -1;
             }
         } else {
+            debugln("FAIL");
             secret_index = -1;
         }
     }
