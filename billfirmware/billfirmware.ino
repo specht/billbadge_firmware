@@ -65,11 +65,13 @@ void handle_press(unsigned long int m, int state) {
         if (state == 1 && button_state == 0) {
             button_state = state;
             last_button_state_change = m;
-            track_secret(m);
-        } else {
+            debugln("button down!");
+            // track_secret(m);
+        } else if (state == 0 && button_state == 1) {
             button_state = state;
             last_button_state_change = m;
-            track_secret(m);
+            debugln("button up!");
+            // track_secret(m);
         }
     }
 }
