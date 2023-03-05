@@ -15,6 +15,8 @@
 int secret = [0, 267, 563, 814, 986, 1262, 1438, 1565, 1712, 1817, 1970, 2089, 2264, 2469];
 int secret_index = -1;
 unsigned long int secret_start = 0;
+int button_state = 0;
+unsigned long int last_button_state_change = 0;
 
 void unicorn_loop() {
     while (1) {
@@ -38,11 +40,25 @@ void unicorn_loop() {
     }
 }
 
+void handle_press(unsigned long int m, int state) {
+    if (m > last_button_state_change + 10) {
+        if (state == 1 && button_state == 0) {
+
+
+        } else {
+
+        }
+    }
+}
+
 void player_loop() {
     while (1) {
+        unsigned long int m = millis();
         if (button::pressed()) {
             player::wololo();
+            handle_press(m, true);
         } else {
+            handle_press(m, false);
             player::recharge();
 
             if (ir::update()) {
