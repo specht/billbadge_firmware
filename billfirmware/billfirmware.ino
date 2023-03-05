@@ -79,9 +79,9 @@ void player_loop() {
         unsigned long int m = millis();
         if (button::pressed()) {
             player::wololo();
-            handle_press(m, true);
+            handle_press(m, 1);
         } else {
-            handle_press(m, false);
+            handle_press(m, 0);
             player::recharge();
 
             if (ir::update()) {
