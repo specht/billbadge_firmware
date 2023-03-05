@@ -46,7 +46,7 @@ void track_secret(unsigned long int m) {
         secret_index = 0;
     }
     if (secret_index >= 0) {
-        unsigned long int diff = abs(m - secret_start) - secret[secret_index + 1]);
+        unsigned long int diff = abs((m - secret_start) - secret[secret_index + 1]);
         debugln(diff, DEC);
         if (diff < 50) {
             secret_index++;
