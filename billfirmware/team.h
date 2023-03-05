@@ -13,4 +13,6 @@ namespace team {
 
     team_t* get_random();
     team_t* from_code(uint16_t code);
+    extern team_t r;
 }
+
