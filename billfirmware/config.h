@@ -15,7 +15,7 @@
 #define WOLOLO_MAX 5           // Max. signals that can be send in a row
 
 #define PLAYER_UPDATE 15       // Fading time for each step in ms
-#define PLAYER_COLOR r         // Start color of player
+#define PLAYER_COLOR g         // Start color of player
 
 #define SAVE_PLAYER_STATS      // Save color in EEPROM
 

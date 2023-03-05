@@ -7,7 +7,7 @@
 #include "ir.h"
 
 #include "config.h"
-#include "IRremote.h "
+#include "IRremote.h"
 
 namespace ir {
     IRsend irsend;
@@ -38,7 +38,7 @@ namespace ir {
 
     uint16_t get_msg() {
         return msg;
-    }
+    } 
 
     void send(uint16_t code) {
         // irsend.sendNEC(code, 32); // kinda sucks
