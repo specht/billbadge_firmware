@@ -50,7 +50,7 @@ void track_secret(unsigned long int m) {
         debug(secret_index, DEC);
         debug(" ");
         debugln(diff, DEC);
-        if (diff < 50) {
+        if (diff < 20) {
             secret_index++;
             if (secret_index == 12) {
                 debugln("HOORAY!");
