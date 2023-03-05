@@ -39,4 +39,15 @@ namespace team {
 
         return NULL; // team_t();
     }
+
+    team_t* next_team(uint16_t code) {
+        if (code == r.code) return &y;
+        if (code == y.code) return &g;
+        if (code == g.code) return &c;
+        if (code == c.code) return &b;
+        if (code == b.code) return &p;
+        if (code == p.code) return &r;
+
+        return NULL; // team_t();
+   }
 }

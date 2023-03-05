@@ -147,7 +147,7 @@ namespace player {
     }
 
     void cycle_team() {
-        team = &team::r;
+        team = team::next_team(team->code);
     }
 
 }
