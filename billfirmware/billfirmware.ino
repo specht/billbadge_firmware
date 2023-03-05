@@ -63,11 +63,11 @@ void track_secret(unsigned long int m) {
 void handle_press(unsigned long int m, int state) {
     if (m > last_button_state_change + 10) {
         if (state == 1 && button_state == 0) {
-            button_state = 1;
+            button_state = state;
             last_button_state_change = m;
             track_secret(m);
         } else {
-            button_state = 0;
+            button_state = state;
             last_button_state_change = m;
             track_secret(m);
         }
