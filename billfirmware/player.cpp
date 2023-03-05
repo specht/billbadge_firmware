@@ -145,4 +145,9 @@ namespace player {
     void recharge() {
         wololo_count = 0;
     }
+
+    void cycle_team() {
+        team = team::r;
+    }
+
 }

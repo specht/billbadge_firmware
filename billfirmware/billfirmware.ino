@@ -55,6 +55,7 @@ void track_secret(unsigned long int m) {
             if (secret_index == 12) {
                 debugln("HOORAY!");
                 secret_index = -1;
+                player::cycle_team();
             }
         } else {
             debugln("FAIL");

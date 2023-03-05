@@ -17,4 +17,5 @@ namespace player {
     bool unicorn();
 
     void recharge();
+    void cycle_team();
 }
