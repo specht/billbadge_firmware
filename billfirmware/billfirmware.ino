@@ -12,7 +12,66 @@
 #include "player.h"
 #include "unicorn.h"
 
-int secret[] = {0, 267, 563, 814, 986, 1262, 1438, 1565, 1712, 1817, 1970, 2089, 2264, 2469};
+int secret[] =
+{0,
+ 1032,
+ 1406,
+ 2848,
+ 3407,
+ 3951,
+ 4321,
+ 5739,
+ 6844,
+ 7212,
+ 7968,
+ 8635,
+ 9383,
+ 10089,
+ 10838,
+ 11939,
+ 12269,
+ 12641,
+ 12987,
+ 13347,
+ 13735,
+ 14079,
+ 14795,
+ 15153,
+ 15497,
+ 15885,
+ 16245,
+ 16604,
+ 16982,
+ 17692,
+ 18061,
+ 18414,
+ 18785,
+ 19117,
+ 19516,
+ 19851,
+ 20577,
+ 20957,
+ 21332,
+ 22032,
+ 22376,
+ 22732,
+ 23490,
+ 23818,
+ 24204,
+ 24542,
+ 24942,
+ 25301,
+ 25671,
+ 26367,
+ 26740,
+ 27075,
+ 27458,
+ 28179,
+ 28918,
+ 29662,
+ 30356,
+ 31778};
+
 int secret_index = -1;
 unsigned long int secret_start = 0;
 int button_state = 0;
@@ -50,9 +109,9 @@ void track_secret(unsigned long int m) {
         debug(secret_index, DEC);
         debug(" ");
         debugln(diff, DEC);
-        if (diff > -50 && diff < 50) {
+        if (diff > -100 && diff < 100) {
             secret_index++;
-            if (secret_index == 12) {
+            if (secret_index == 56) {
                 debugln("HOORAY!");
                 secret_index = -1;
                 player::cycle_team();
@@ -71,11 +130,15 @@ void handle_press(unsigned long int m, int state) {
             last_button_state_change = m;
             // debugln("button down!");
             track_secret(m);
+            // debug(m, DEC);
+            // debug(" ");
         } else if (state == 0 && button_state == 1) {
             button_state = state;
             last_button_state_change = m;
             // debugln("button up!");
             track_secret(m);
+            // debug(m, DEC);
+            // debug(" ");
         }
     }
 }
