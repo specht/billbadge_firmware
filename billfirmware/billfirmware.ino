@@ -12,7 +12,7 @@
 #include "player.h"
 #include "unicorn.h"
 
-int secret = [0, 267, 563, 814, 986, 1262, 1438, 1565, 1712, 1817, 1970, 2089, 2264, 2469];
+int secret[] = [0, 267, 563, 814, 986, 1262, 1438, 1565, 1712, 1817, 1970, 2089, 2264, 2469];
 int secret_index = -1;
 unsigned long int secret_start = 0;
 int button_state = 0;
