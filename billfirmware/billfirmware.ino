@@ -136,7 +136,7 @@ void handle_press(unsigned long int m, int state) {
             button_state = state;
             last_button_state_change = m;
             // debugln("button up!");
-            track_secret(m);
+            // track_secret(m);
             // debug(m, DEC);
             // debug(" ");
         }
