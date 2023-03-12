@@ -12,183 +12,155 @@
 #include "player.h"
 #include "unicorn.h"
 
-int secret[] =
-{0,
- 1032,
- 1406,
- 2848,
- 3407,
- 3951,
- 4321,
- 5739,
- 6844,
- 7212,
- 7968,
- 8635,
- 9383,
- 10089,
- 10838,
- 11939,
- 12269,
- 12641,
- 12987,
- 13347,
- 13735,
- 14079,
- 14795,
- 15153,
- 15497,
- 15885,
- 16245,
- 16604,
- 16982,
- 17692,
- 18061,
- 18414,
- 18785,
- 19117,
- 19516,
- 19851,
- 20577,
- 20957,
- 21332,
- 22032,
- 22376,
- 22732,
- 23490,
- 23818,
- 24204,
- 24542,
- 24942,
- 25301,
- 25671,
- 26367,
- 26740,
- 27075,
- 27458,
- 28179,
- 28918,
- 29662,
- 30356,
- 31778};
+const uint8_t secret[] PROGMEM = {
+  0, 6, 8, 16, 18, 22, 24, 32, 38, 40, 44, 48, 52, 56, 60, 66, 68, 70, 72, 74, 76, 78,
+  82, 84, 86, 88, 90, 92, 94, 98, 100, 102, 104, 106, 108, 110, 114, 116, 118, 122,
+  124, 126, 130, 132, 134, 136, 138, 140, 142, 146, 148, 150, 152, 156, 160, 164
+};
+uint16_t note_time[56];
 
-int secret_index = -1;
+int secret_index = 0;
 unsigned long int secret_start = 0;
 int button_state = 0;
-unsigned long int last_button_state_change = 0;
+unsigned long int button_debounce_counter = 0;
+unsigned long int first_note = 0;
 
 void unicorn_loop() {
-    while (1) {
-        if (button::pressed()) {
-            unicorn::wololo();
-        } else {
-            unicorn::recharge();
+  while (1) {
+    if (button::pressed()) {
+      unicorn::wololo();
+    } else {
+      unicorn::recharge();
 
-            if (ir::update()) {
-                uint16_t msg = ir::get_msg();
-                if (msg == PARTY_CODE) {
-                    unicorn::party();
-                } else if (msg == PARTY_HARD_CODE) {
-                    unicorn::party_hard();
-                }
-            }
+      if (ir::update()) {
+        uint16_t msg = ir::get_msg();
+        if (msg == PARTY_CODE) {
+          unicorn::party();
+        } else if (msg == PARTY_HARD_CODE) {
+          unicorn::party_hard();
         }
-
-        unicorn::update();
-        led::update();
+      }
     }
+
+    unicorn::update();
+    led::update();
+  }
 }
 
-void track_secret(unsigned long int m) {
-    if (secret_index == -1) {
-        secret_start = m;
-        secret_index = 0;
+void track_secret() {
+  unsigned long int m = millis();
+  if (m < button_debounce_counter) return;
+  button_debounce_counter = m + 150;
+
+  // reset if no note has been played for two seconds
+  if (secret_index > 0 && m - first_note - note_time[secret_index - 1] > 2000) secret_index = 0;
+
+  // store note time
+  if (secret_index == 0) {
+    note_time[secret_index] = 0;
+    first_note = m;
+  } else {
+    note_time[secret_index] = m - first_note;
+  }
+  /*
+  debug(secret_index, DEC);
+  debug(" <= ");
+  debugln(m, DEC);
+  debugln("");
+  */
+  secret_index++;
+  if (secret_index == 56) {
+    secret_index = 0;
+    unsigned long int ten_bars = note_time[54];
+    /*
+    debug(ten_bars, DEC);
+    debug(" ");
+    debugln();
+    */
+    bool correct = true;
+    for (int i = 0; i < 56; i++) {
+      long int d = ((long int)note_time[i]) * 160 / ten_bars;
+      uint8_t s = pgm_read_byte_near(secret + i);
+      /*
+      debug(i, DEC);
+      debug(" ");
+      debug(note_time[i], DEC);
+      debug(" ");
+      debug(d, DEC);
+      debug(" ");
+      debugln(s, DEC);
+      */
+      if (abs(d - s) > 1) {
+        correct = false;
+        break;
+      }
     }
-    if (secret_index >= 0) {
-        long int diff = ((long int)m - secret_start) - secret[secret_index];
-        debug(secret_index, DEC);
-        debug(" ");
-        debugln(diff, DEC);
-        if (diff > -100 && diff < 100) {
-            secret_index++;
-            if (secret_index == 56) {
-                debugln("HOORAY!");
-                secret_index = -1;
-                player::cycle_team();
-            }
-        } else {
-            debugln("FAIL");
-            secret_index = -1;
-        }
-    }
+    if (correct) player::cycle_team();
+  }
 }
 
-void handle_press(unsigned long int m, int state) {
-    if (m > last_button_state_change + 10) {
-        if (state == 1 && button_state == 0) {
-            button_state = state;
-            last_button_state_change = m;
-            // debugln("button down!");
-            track_secret(m);
-            // debug(m, DEC);
-            // debug(" ");
-        } else if (state == 0 && button_state == 1) {
-            button_state = state;
-            last_button_state_change = m;
-            // debugln("button up!");
-            // track_secret(m);
-            // debug(m, DEC);
-            // debug(" ");
-        }
-    }
+void handle_press(int state) {
+  /*
+  debug(button_debounce_counter, DEC);
+  debug(" ");
+  debug(state, DEC);
+  debug(" ");
+  debug(button_state, DEC);
+  debugln();
+  */
+  if (state == 1 && button_state == 0) {
+    button_state = state;
+    track_secret();
+  } else if (state == 0 && button_state == 1) {
+    button_state = state;
+  }
 }
 
 void player_loop() {
     while (1) {
-        unsigned long int m = millis();
         if (button::pressed()) {
             player::wololo();
-            handle_press(m, 1);
+            handle_press(1);
         } else {
-            handle_press(m, 0);
             player::recharge();
 
-            if (ir::update()) {
-                uint16_t msg = ir::get_msg();
+      if (ir::update()) {
+        uint16_t msg = ir::get_msg();
 
-                if (msg == PARTY_CODE) {
-                    unicorn::party();
-                } else if (msg == PARTY_HARD_CODE) {
-                    unicorn::party_hard();
-                } else {
-                    player::convert(msg);
-                }
-            }
+        if (msg == PARTY_CODE) {
+          unicorn::party();
+        } else if (msg == PARTY_HARD_CODE) {
+          unicorn::party_hard();
+        } else {
+          player::convert(msg);
         }
-
-        player::update();
-        led::update();
+      }
+      handle_press(0);
     }
+
+    player::update();
+    led::update();
+  }
 }
 
 void setup() {
-    debug_init();
-    debugln("Booting Bill... please stand by...");
+  debug_init();
+  debugln("Booting Bill... please stand by...");
 
-    eeprom::begin();
-    ir::begin();
-    led::begin();
-    button::begin();
-    player::begin();
-    unicorn::begin();
+  eeprom::begin();
+  ir::begin();
+  led::begin();
+  button::begin();
+  player::begin();
+  unicorn::begin();
 
-    debugln("Bill up and running!");
+  debugln("Bill up and running!");
 
-    if (unicorn::enabled()) {
-        unicorn_loop();
-    } else {
-        player_loop();
-    }
+  if (unicorn::enabled()) {
+    unicorn_loop();
+  } else {
+    player_loop();
+  }
 }
 
 void loop() {}
