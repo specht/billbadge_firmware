@@ -20,31 +20,30 @@ const uint8_t secret[] PROGMEM = {
 uint16_t note_time[56];
 
 int secret_index = 0;
-unsigned long int secret_start = 0;
 int button_state = 0;
 unsigned long int button_debounce_counter = 0;
 unsigned long int first_note = 0;
 
 void unicorn_loop() {
-  while (1) {
-    if (button::pressed()) {
-      unicorn::wololo();
-    } else {
-      unicorn::recharge();
+    while (1) {
+        if (button::pressed()) {
+            unicorn::wololo();
+        } else {
+            unicorn::recharge();
 
-      if (ir::update()) {
-        uint16_t msg = ir::get_msg();
-        if (msg == PARTY_CODE) {
-          unicorn::party();
-        } else if (msg == PARTY_HARD_CODE) {
-          unicorn::party_hard();
+            if (ir::update()) {
+                uint16_t msg = ir::get_msg();
+                if (msg == PARTY_CODE) {
+                    unicorn::party();
+                } else if (msg == PARTY_HARD_CODE) {
+                    unicorn::party_hard();
+                }
+            }
         }
-      }
-    }
 
-    unicorn::update();
-    led::update();
-  }
+        unicorn::update();
+        led::update();
+    }
 }
 
 void track_secret() {
@@ -99,7 +98,7 @@ void track_secret() {
   }
 }
 
-void handle_press(int state) {
+void handle_press() {
   /*
   debug(button_debounce_counter, DEC);
   debug(" ");
@@ -108,11 +107,9 @@ void handle_press(int state) {
   debug(button_state, DEC);
   debugln();
   */
-  if (state == 1 && button_state == 0) {
-    button_state = state;
+  if (button_state == 0) {
+    button_state = 1;
     track_secret();
-  } else if (state == 0 && button_state == 1) {
-    button_state = state;
   }
 }
 
@@ -120,47 +117,47 @@ void player_loop() {
     while (1) {
         if (button::pressed()) {
             player::wololo();
-            handle_press(1);
+            handle_press();
         } else {
             player::recharge();
 
-      if (ir::update()) {
-        uint16_t msg = ir::get_msg();
+            if (ir::update()) {
+                uint16_t msg = ir::get_msg();
 
-        if (msg == PARTY_CODE) {
-          unicorn::party();
-        } else if (msg == PARTY_HARD_CODE) {
-          unicorn::party_hard();
-        } else {
-          player::convert(msg);
+                if (msg == PARTY_CODE) {
+                    unicorn::party();
+                } else if (msg == PARTY_HARD_CODE) {
+                    unicorn::party_hard();
+                } else {
+                    player::convert(msg);
+                }
+            }
+            button_state = 0;
         }
-      }
-      handle_press(0);
-    }
 
-    player::update();
-    led::update();
-  }
+        player::update();
+        led::update();
+    }
 }
 
 void setup() {
-  debug_init();
-  debugln("Booting Bill... please stand by...");
+    debug_init();
+    debugln("Booting Bill... please stand by...");
 
-  eeprom::begin();
-  ir::begin();
-  led::begin();
-  button::begin();
-  player::begin();
-  unicorn::begin();
+    eeprom::begin();
+    ir::begin();
+    led::begin();
+    button::begin();
+    player::begin();
+    unicorn::begin();
 
-  debugln("Bill up and running!");
+    debugln("Bill up and running!");
 
-  if (unicorn::enabled()) {
-    unicorn_loop();
-  } else {
-    player_loop();
-  }
+    if (unicorn::enabled()) {
+        unicorn_loop();
+    } else {
+        player_loop();
+    }
 }
 
 void loop() {}

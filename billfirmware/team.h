@@ -16,4 +16,3 @@ namespace team {
     team_t* next_team(uint16_t code);
     extern team_t r, y, g, c, b, p;
 }
-
