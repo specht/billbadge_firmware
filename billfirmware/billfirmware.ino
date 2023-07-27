@@ -49,7 +49,6 @@ void unicorn_loop() {
 }
 
 void track_secret() {
-  debugln("oy!");
   unsigned long int m = millis();
   if (m < button_debounce_counter) return;
   button_debounce_counter = m + 150;
@@ -66,7 +65,6 @@ void track_secret() {
     uint8_t s = pgm_read_byte_near(secret + secret_index);
     if (abs(d - s) <= 2) {
       secret_index++;
-      debugln(secret_index);
       if (secret_index == 56) {
           player::cycle_team();
           secret_index = 0;
