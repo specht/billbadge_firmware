@@ -61,34 +61,14 @@ void track_secret() {
   } else {
     note_time[secret_index] = m - first_note;
   }
-  /*
-  debug(secret_index, DEC);
-  debug(" <= ");
-  debugln(m, DEC);
-  debugln("");
-  */
   secret_index++;
   if (secret_index == 56) {
     secret_index = 0;
     unsigned long int ten_bars = note_time[54];
-    /*
-    debug(ten_bars, DEC);
-    debug(" ");
-    debugln();
-    */
     bool correct = true;
     for (int i = 0; i < 56; i++) {
       long int d = ((long int)note_time[i]) * 160 / ten_bars;
       uint8_t s = pgm_read_byte_near(secret + i);
-      /*
-      debug(i, DEC);
-      debug(" ");
-      debug(note_time[i], DEC);
-      debug(" ");
-      debug(d, DEC);
-      debug(" ");
-      debugln(s, DEC);
-      */
       if (abs(d - s) > 1) {
         correct = false;
         break;
@@ -99,14 +79,6 @@ void track_secret() {
 }
 
 void handle_press() {
-  /*
-  debug(button_debounce_counter, DEC);
-  debug(" ");
-  debug(state, DEC);
-  debug(" ");
-  debug(button_state, DEC);
-  debugln();
-  */
   if (button_state == 0) {
     button_state = 1;
     track_secret();
