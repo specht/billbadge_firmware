@@ -12,17 +12,19 @@
 #include "player.h"
 #include "unicorn.h"
 
+#define MS_PER_BAR 2894
+#define BEATS_PER_BAR 16
 const uint8_t secret[] PROGMEM = {
   0, 6, 8, 16, 18, 22, 24, 32, 38, 40, 44, 48, 52, 56, 60, 66, 68, 70, 72, 74, 76, 78,
   82, 84, 86, 88, 90, 92, 94, 98, 100, 102, 104, 106, 108, 110, 114, 116, 118, 122,
   124, 126, 130, 132, 134, 136, 138, 140, 142, 146, 148, 150, 152, 156, 160, 164
 };
-uint16_t note_time[56];
 
 int secret_index = 0;
 int button_state = 0;
 unsigned long int button_debounce_counter = 0;
 unsigned long int first_note = 0;
+unsigned long int latest_note = 0;
 
 void unicorn_loop() {
     while (1) {
@@ -47,34 +49,31 @@ void unicorn_loop() {
 }
 
 void track_secret() {
+  debugln("oy!");
   unsigned long int m = millis();
   if (m < button_debounce_counter) return;
   button_debounce_counter = m + 150;
 
   // reset if no note has been played for two seconds
-  if (secret_index > 0 && m - first_note - note_time[secret_index - 1] > 2000) secret_index = 0;
+  if (secret_index > 0 && m - latest_note > 2000) secret_index = 0;
+  latest_note = m;
 
-  // store note time
   if (secret_index == 0) {
-    note_time[secret_index] = 0;
     first_note = m;
+    secret_index = 1;
   } else {
-    note_time[secret_index] = m - first_note;
-  }
-  secret_index++;
-  if (secret_index == 56) {
-    secret_index = 0;
-    unsigned long int ten_bars = note_time[54];
-    bool correct = true;
-    for (int i = 0; i < 56; i++) {
-      long int d = ((long int)note_time[i]) * 160 / ten_bars;
-      uint8_t s = pgm_read_byte_near(secret + i);
-      if (abs(d - s) > 1) {
-        correct = false;
-        break;
+    long int d = (m - first_note) * BEATS_PER_BAR / MS_PER_BAR;
+    uint8_t s = pgm_read_byte_near(secret + secret_index);
+    if (abs(d - s) <= 1) {
+      secret_index++;
+      debugln(secret_index);
+      if (secret_index == 56) {
+          player::cycle_team();
+          secret_index = 0;
       }
+    } else {
+      secret_index = 0;
     }
-    if (correct) player::cycle_team();
   }
 }
 
