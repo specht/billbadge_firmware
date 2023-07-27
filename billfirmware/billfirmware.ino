@@ -62,9 +62,9 @@ void track_secret() {
     first_note = m;
     secret_index = 1;
   } else {
-    long int d = (m - first_note) * BEATS_PER_BAR / MS_PER_BAR;
+    long int d = (long int)(m - first_note) * BEATS_PER_BAR / MS_PER_BAR;
     uint8_t s = pgm_read_byte_near(secret + secret_index);
-    if (abs(d - s) <= 1) {
+    if (abs(d - s) <= 2) {
       secret_index++;
       debugln(secret_index);
       if (secret_index == 56) {
